@@ -5,14 +5,18 @@ import { withStyles } from '@material-ui/core/styles';
 import FormControl from '@material-ui/core/FormControl';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Input from '@material-ui/core/Input';
-import Typography from '@material-ui/core/Typography';
+
+import Tooltip from '@material-ui/core/Tooltip';
+import IconButton from '@material-ui/core/IconButton';
+import InfoIcon from '@material-ui/icons/InfoOutlined';
+// import Typography from '@material-ui/core/Typography';
+// import Typography from '@material-ui/core/Typography';
 
 import fieldStyles from './field-styles';
-import PopoverInfo from './components/PopoverInfo';
+// import PopoverInfo from './components/PopoverInfo'; removed for fix animation problems
 
 // for unit testing only
 export class RawConfiguredField extends React.Component {
-
   shouldComponentUpdate = (nextProps, nextState) => {
     if (this.props.data !== nextProps.data) return true;
     if (this.state.anchorEl !== nextState.anchorEl) return true;
@@ -21,47 +25,60 @@ export class RawConfiguredField extends React.Component {
 
   formatErrorMessages = () => {
     const { errors } = this.props;
-    return errors.map( error => error.message).toString();
-  }
+    return errors.map(error => error.message).toString();
+  };
 
   render() {
     const {
       classes = {},
-        data,
-        type,
-        descriptionText,
-        helpT = helpText,
-        showHelperError,
-        Component = Input,
-        LabelComponent,
-        labelComponentProps = {},
-        title,
-        className,
-        componentProps = {},
-        id,
-        errors
+      data,
+      type,
+      descriptionText,
+      helpText: helpT,
+      showHelperError,
+      Component = Input,
+      LabelComponent,
+      labelComponentProps = {},
+      title,
+      className,
+      componentProps = {},
+      id,
+      errors
     } = this.props;
-    const helpText = (showHelperError && errors && errors.length > 0) ? this.formatErrorMessages() : helpT;
+    const helpText =
+      showHelperError && errors && errors.length > 0
+        ? this.formatErrorMessages()
+        : helpT;
     return (
-      <FormControl error={errors && errors.length > 0} className={classNames(classes.root, { [classes.withLabel]: LabelComponent })}>
-        {LabelComponent && title &&
-          (<LabelComponent className={classes.label} {...labelComponentProps}>
-              {title}
-              {descriptionText ?
-                <PopoverInfo
-                  descriptionText={descriptionText}
-                  classes={classes}
-                /> : null}
-          </LabelComponent>)
-        }
-        {descriptionText && !(LabelComponent && title) ?
-          <PopoverInfo
-            descriptionText={descriptionText}
-            classes={classes}
-          /> : null}
+      <FormControl
+        error={errors && errors.length > 0}
+        className={classNames(classes.root, {
+          [classes.withLabel]: LabelComponent
+        })}
+      >
+        {LabelComponent && title && (
+          <LabelComponent className={classes.label} {...labelComponentProps}>
+            {title}
+            {descriptionText ? (
+              <Tooltip title={descriptionText} placement="top-start">
+                <IconButton>
+                  <InfoIcon />
+                </IconButton>
+              </Tooltip>
+            ) : null}
+          </LabelComponent>
+        )}
+        {descriptionText && !(LabelComponent && title) ? (
+          <Tooltip title={descriptionText} placement="top-start">
+            <IconButton>
+              <InfoIcon />
+            </IconButton>
+          </Tooltip>
+        ) : null}
         <Component
           className={className && classes[className]}
           value={data}
+          htmlId={labelComponentProps.htmlFor}
           type={type}
           {...componentProps}
         />
